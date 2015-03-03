@@ -1,0 +1,20 @@
+{% block head %}
+
+  <meta charset="utf-8"/>
+
+  {% block title %}
+    <title>{{ page_title|title }}</title>
+  {% endblock %}
+
+  {% block stylesheets %}
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/bootstrap/css/bootstrap.min.css" />
+  {#
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/style.css" />
+  #}
+  {% endblock %}
+
+  {% block javascripts %}
+    <script type="text/javascript" src="/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap/js/bootstrap.min.js"></script>
+  {% endblock %}
+{% endblock %}
