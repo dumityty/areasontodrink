@@ -1,5 +1,8 @@
 <?php
 require '../vendor/autoload.php';
+// require '../vendor/rb.php';
+
+// R::setup('mysql:host=localhost; dbname=areasontodrink', 'root', 'titi');
 
 // Include the app configuration file.
 // require_once dirname(dirname(__FILE__)) . '/app/config.php';
@@ -34,25 +37,37 @@ require dirname(dirname(__FILE__)) . '/app/routes/routes.php';
 
 // the default root endpoint
 $app->get('/', function() use ($app) {
+  // $rid = 1;
+  // $reason = R::findOne('reasons', 'id = :rid', array(':rid' => $rid));
+
+  // krumo($reason);
+  // krumo('aa');
+
   $app->render('routes/index.html.twig', array(
     'page_title' => 'SlimPHP Skeleton App'
     ));
 });
 
-// example of endpoint that return json
-$app->get('/json-example', function() use ($app) {
-  try {
-    $data = array('hello' => 'world');
-  }
-  catch(Exception $e) {
-    $data = array(
-      'error' => array(
-        'message' => $e->getMessage(),
-      ),
-    );
-  }
+$app->get('/add', function() use ($app) {
+  // krumo($app->request->get());
+  $app->render('routes/add.html.twig', array(
+    'page_title' => 'SlimPHP Skeleton App'
+  ));
+});
 
-  setResponse(200, $data);
+$app->post('/add', function() use ($app) {
+  $req = $app->request();
+  // krumo($req);
+  $post_data = $app->request->post();
+  // krumo($post_data);
+  $body = $app->request->getBody();
+  // krumo($body);
+  syslog(LOG_INFO,'===================');
+  syslog(LOG_INFO, print_r($post_data,true));
+
+  // $app->render('routes/add.html.twig', array(
+  //   'page_title' => 'SlimPHP Skeleton App'
+  // ));
 });
 
 $app->run();
