@@ -56,14 +56,8 @@ $app->get('/add', function() use ($app) {
 });
 
 $app->post('/add', function() use ($app) {
-  $req = $app->request();
-  // krumo($req);
   $post_data = $app->request->post();
-  // krumo($post_data);
-  $body = $app->request->getBody();
-  // krumo($body);
-  syslog(LOG_INFO,'===================');
-  syslog(LOG_INFO, print_r($post_data,true));
+  krumo($post_data);
 
   // $app->render('routes/add.html.twig', array(
   //   'page_title' => 'SlimPHP Skeleton App'
