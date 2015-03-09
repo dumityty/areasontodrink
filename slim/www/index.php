@@ -1,4 +1,7 @@
 <?php
+session_cache_limiter(false);
+session_start();
+
 require '../vendor/autoload.php';
 require '../vendor/rb.php';
 
@@ -43,12 +46,30 @@ $app->get('/', function() use ($app) {
   // when selecting perhaps add the reason in a table of most recent ones
   // then when randomly selecting don't select the same ones that have
   // been selected the past 3 times or so
-  $reason = R::getRow('SELECT r.id,r.reason FROM reasons r LEFT JOIN queue q ON r.id = q.rid WHERE q.rid IS NULL ORDER BY RAND() LIMIT 1');
+
+  // clean_reason_queue();
+  // $_SESSION['queue'][] = '1';
+  // krumo($_SESSION['queue']);
+  if (isset($_SESSION['queue'])) {
+    $queue = implode(',',$_SESSION['queue']);
+    $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($queue)";
+  }
+  else {
+    $queue = '';
+    $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id ORDER BY RAND() LIMIT 1";
+  }
+  // $queue = $_SESSION['queue'];
+  krumo($queue);
+  // $reason = R::getRow('SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN (:queue) ORDER BY RAND() LIMIT 1', array('queue' => $queue));
+  // $place_holders = implode(',', array_fill(0, count($queue), '?'));
+  // $reason = R::getRow('SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($place_holders) ORDER BY RAND() LIMIT 1', array($queue));
   
-  // krumo($reason);
+  krumo($sql);
+  $reason = R::getRow($sql);
+
+  krumo($reason);
 
   add_reason_queue($reason['id']);
-  clean_reason_queue();
   
   $app->render('routes/index.html.twig', array(
     'page_title' => 'SlimPHP Skeleton App',
@@ -57,13 +78,19 @@ $app->get('/', function() use ($app) {
 })->name('home');
 
 function add_reason_queue($rid) {
-  $sql = "INSERT INTO queue (rid) VALUES (:rid)";
-  R::exec($sql, array(':rid' => $rid));
+  if (isset($rid)) {
+    // $sql = "INSERT INTO queue (rid) VALUES (:rid)";
+    // R::exec($sql, array(':rid' => $rid));
+    if ((!isset($_SESSION['queue'])) || (isset($_SESSION['queue']) && !in_array($rid, $_SESSION['queue']))) {
+      $_SESSION['queue'][] = $rid;
+    }
+  }
 }
 
 function clean_reason_queue() {
-  $sql  = "DELETE FROM queue WHERE id NOT IN (SELECT id FROM (SELECT id FROM queue ORDER BY id DESC LIMIT 5) q)";
-  R::exec($sql);
+  // $sql  = "DELETE FROM queue WHERE id NOT IN (SELECT id FROM (SELECT id FROM queue ORDER BY id DESC LIMIT 5) q)";
+  // R::exec($sql);
+  unset($_SESSION['queue']);
 }
 
 $app->get('/add', function() use ($app) {
