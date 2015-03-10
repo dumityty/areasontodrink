@@ -40,6 +40,16 @@ require dirname(dirname(__FILE__)) . '/app/routes/routes.php';
 
 // the default root endpoint
 $app->get('/', function() use ($app) {
+  // maybe time the last time it took a count of reasons
+  // so you can refresh the total number of reasons after 5 minutes or so
+  // what happens at the beginning when there are few reasons
+  // take that into account
+  // maybe <5 ? always refresh the count if number is small
+  if (!isset($_SESSION['count_reasons']) || $_SESSION['count_reasons'] < 5) {
+    $count_reasons =R::count('reasons');
+    $_SESSION['count_reasons'] = (int)$count_reasons;
+  }
+
   // $rid = 1;
   // $reason = R::findOne('reasons', 'id = :rid', array(':rid' => $rid));
 
@@ -47,29 +57,27 @@ $app->get('/', function() use ($app) {
   // then when randomly selecting don't select the same ones that have
   // been selected the past 3 times or so
 
-  // clean_reason_queue();
-  // $_SESSION['queue'][] = '1';
-  // krumo($_SESSION['queue']);
   if (isset($_SESSION['queue'])) {
     $queue = implode(',',$_SESSION['queue']);
-    $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($queue)";
+    $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($queue) ORDER BY RAND() LIMIT 1";
   }
   else {
     $queue = '';
     $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id ORDER BY RAND() LIMIT 1";
   }
   // $queue = $_SESSION['queue'];
-  krumo($queue);
+  // krumo($queue);
   // $reason = R::getRow('SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN (:queue) ORDER BY RAND() LIMIT 1', array('queue' => $queue));
   // $place_holders = implode(',', array_fill(0, count($queue), '?'));
   // $reason = R::getRow('SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($place_holders) ORDER BY RAND() LIMIT 1', array($queue));
   
-  krumo($sql);
+  // krumo($sql);
   $reason = R::getRow($sql);
 
-  krumo($reason);
+  // krumo($reason);
 
   add_reason_queue($reason['id']);
+  clean_reason_queue();
   
   $app->render('routes/index.html.twig', array(
     'page_title' => 'SlimPHP Skeleton App',
@@ -90,7 +98,18 @@ function add_reason_queue($rid) {
 function clean_reason_queue() {
   // $sql  = "DELETE FROM queue WHERE id NOT IN (SELECT id FROM (SELECT id FROM queue ORDER BY id DESC LIMIT 5) q)";
   // R::exec($sql);
-  unset($_SESSION['queue']);
+
+  // unset($_SESSION['queue']);
+  
+  $limit_reasons = $_SESSION['count_reasons']/2;
+
+  // if we reached the limit of reasons to keep in queue 
+  // (half of total number of reasons in this case)
+  // then start removing elements from the beginning of the array
+  if (count($_SESSION['queue']) > $limit_reasons) {
+    array_shift($_SESSION['queue']);
+  }
+
 }
 
 $app->get('/add', function() use ($app) {
