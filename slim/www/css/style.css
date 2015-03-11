@@ -1,5 +1,46 @@
+body { 
+	/*navbar-fixed-top*/
+	/*padding-top: 70px; */
+}
+
 .navbar-brand { 
 	font-family: 'Just Another Hand', cursive;
 	font-size: 35px;
 	letter-spacing: 2px;
+}
+
+.navbar {
+	background-color: #FB0C06;
+	border-color: #FB0C06;
+	border: none;
+	border-radius: 0;
+}
+
+.navbar a.navbar-brand {
+	color: #fff;
+}
+.navbar a.navbar-brand:hover {
+	color: #fff;
+}
+
+.navbar-default .navbar-toggle {
+	color: #fff;
+	border: none;
+}
+.navbar-default .navbar-toggle:focus ,
+.navbar-default .navbar-toggle:active ,
+.navbar-default .navbar-toggle:hover {
+	background: none;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+	background-color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a {
+	color: #fff;
+	text-align: center;
+}
+.navbar-default .navbar-nav>li>a:hover {
+	color: #FFC52C;
 }

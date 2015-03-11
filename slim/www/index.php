@@ -4,8 +4,10 @@ session_start();
 
 require '../vendor/autoload.php';
 require '../vendor/rb.php';
+require '../app/config.php';
 
-R::setup('mysql:host=localhost; dbname=areasontodrink', 'root', 'titi');
+
+R::setup('mysql:host=localhost; dbname=' . $db_name, $db_user, $db_pass);
 
 // Include the app configuration file.
 // require_once dirname(dirname(__FILE__)) . '/app/config.php';
@@ -71,16 +73,12 @@ $app->get('/', function() use ($app) {
   // $place_holders = implode(',', array_fill(0, count($queue), '?'));
   // $reason = R::getRow('SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($place_holders) ORDER BY RAND() LIMIT 1', array($queue));
   
-  // krumo($sql);
   $reason = R::getRow($sql);
-
-  // krumo($reason);
 
   add_reason_queue($reason['id']);
   clean_reason_queue();
   
   $app->render('routes/index.html.twig', array(
-    'page_title' => 'SlimPHP Skeleton App',
     'reason' => $reason,
   ));
 })->name('home');
@@ -113,7 +111,6 @@ function clean_reason_queue() {
 }
 
 $app->get('/add', function() use ($app) {
-  // krumo($app->request->get());
   $app->render('routes/add.html.twig', array(
     'page_title' => 'SlimPHP Skeleton App'
   ));
@@ -128,17 +125,12 @@ $app->post('/add', function() use ($app) {
   $reason->created = time();
   $id = R::store($reason);
 
-  krumo($id);
-
   $app->redirectTo('home');
-
-  // $app->render('routes/add.html.twig', array(
-  //   'page_title' => 'SlimPHP Skeleton App'
-  // ));
 });
 
 $app->get('/why', function() use ($app) {
-
+  $app->render('routes/why.html.twig', array(
+  ));
 })->name('why');
 
 $app->run();
