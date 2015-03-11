@@ -58,9 +58,9 @@ $app->get('/', function() use ($app) {
   // when selecting perhaps add the reason in a table of most recent ones
   // then when randomly selecting don't select the same ones that have
   // been selected the past 3 times or so
-  if (isset($_SESSION['queue'])) {
+  if ( (isset($_SESSION['queue'])) && (count($_SESSION['queue'])>0) ) {
     $queue = implode(',',$_SESSION['queue']);
-    krumo($queue);
+    // krumo($queue);
     $sql = "SELECT r.id,r.reason FROM reasons r LEFT JOIN reported re ON r.id = re.rid WHERE (r.id NOT IN ($queue)) AND (re.id IS NULL) ORDER BY RAND() LIMIT 1";
   }
   else {
