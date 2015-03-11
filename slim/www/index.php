@@ -61,7 +61,7 @@ $app->get('/', function() use ($app) {
   if (isset($_SESSION['queue'])) {
     $queue = implode(',',$_SESSION['queue']);
     krumo($queue);
-    $sql = "SELECT r.id,r.reason FROM reasons r LEFT JOIN reported re ON r.id = re.rid WHERE r.id NOT IN ($queue) AND (re.id IS NULL) ORDER BY RAND() LIMIT 1";
+    $sql = "SELECT r.id,r.reason FROM reasons r LEFT JOIN reported re ON r.id = re.rid WHERE (r.id NOT IN ($queue)) AND (re.id IS NULL) ORDER BY RAND() LIMIT 1";
   }
   else {
     $queue = '';
