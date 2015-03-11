@@ -3,6 +3,9 @@ body {
 	/*padding-top: 70px; */
 }
 
+/**
+ * HEADER
+ */
 .navbar-brand { 
 	font-family: 'Just Another Hand', cursive;
 	font-size: 35px;
@@ -44,3 +47,31 @@ body {
 .navbar-default .navbar-nav>li>a:hover {
 	color: #FFC52C;
 }
+
+
+/**
+ * CONTENT
+ */
+
+.flash {
+	text-align: center;
+}
+
+.reason {
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	border-bottom: solid 1px #ccc;
+}
+
+.report {
+	float: right;
+}
+
+
+
+
+
+
+
+
+

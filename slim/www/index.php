@@ -58,14 +58,14 @@ $app->get('/', function() use ($app) {
   // when selecting perhaps add the reason in a table of most recent ones
   // then when randomly selecting don't select the same ones that have
   // been selected the past 3 times or so
-
   if (isset($_SESSION['queue'])) {
     $queue = implode(',',$_SESSION['queue']);
-    $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($queue) ORDER BY RAND() LIMIT 1";
+    krumo($queue);
+    $sql = "SELECT r.id,r.reason FROM reasons r LEFT JOIN reported re ON r.id = re.rid WHERE r.id NOT IN ($queue) AND (re.id IS NULL) ORDER BY RAND() LIMIT 1";
   }
   else {
     $queue = '';
-    $sql = "SELECT r.id,r.reason FROM reasons r WHERE r.id ORDER BY RAND() LIMIT 1";
+    $sql = "SELECT r.id,r.reason FROM reasons r LEFT JOIN reported re ON r.id = re.rid WHERE re.id IS NULL ORDER BY RAND() LIMIT 1";
   }
   // $queue = $_SESSION['queue'];
   // krumo($queue);
@@ -74,9 +74,15 @@ $app->get('/', function() use ($app) {
   // $reason = R::getRow('SELECT r.id,r.reason FROM reasons r WHERE r.id NOT IN ($place_holders) ORDER BY RAND() LIMIT 1', array($queue));
   
   $reason = R::getRow($sql);
-
-  add_reason_queue($reason['id']);
-  clean_reason_queue();
+  // krumo($reason);
+  if ($reason != null) {
+    add_reason_queue($reason['id']);
+    clean_reason_queue();
+  }
+  else {
+    purge_queue();
+    $app->flashNow('info', 'Sorry! No reasons!');
+  }
   
   $app->render('routes/index.html.twig', array(
     'reason' => $reason,
@@ -97,9 +103,8 @@ function clean_reason_queue() {
   // $sql  = "DELETE FROM queue WHERE id NOT IN (SELECT id FROM (SELECT id FROM queue ORDER BY id DESC LIMIT 5) q)";
   // R::exec($sql);
 
-  // unset($_SESSION['queue']);
   
-  $limit_reasons = $_SESSION['count_reasons']/2;
+  $limit_reasons = $_SESSION['count_reasons'] / 2;
 
   // if we reached the limit of reasons to keep in queue 
   // (half of total number of reasons in this case)
@@ -110,6 +115,10 @@ function clean_reason_queue() {
 
 }
 
+function purge_queue() {
+  unset($_SESSION['queue']);  
+}
+
 $app->get('/add', function() use ($app) {
   $app->render('routes/add.html.twig', array(
     'page_title' => 'SlimPHP Skeleton App'
@@ -118,7 +127,6 @@ $app->get('/add', function() use ($app) {
 
 $app->post('/add', function() use ($app) {
   $post_data = $app->request->post();
-  krumo($post_data);
 
   $reason = R::dispense('reasons');
   $reason->reason = $post_data['reason'];
@@ -132,6 +140,18 @@ $app->get('/why', function() use ($app) {
   $app->render('routes/why.html.twig', array(
   ));
 })->name('why');
+
+$app->get('/report/:rid', function($rid) use ($app) {
+  // $sql = "INSERT INTO reported (rid) VALUES (:rid)";
+  // R::exec($sql, array(':rid' => $rid));
+
+  $reported = R::dispense('reported');
+  $reported->rid = $rid;
+  $id = R::store($reported);
+
+  $app->flash('info', 'Reason has been reported.');
+  $app->redirectTo('home');
+})->name('report');
 
 $app->run();
 

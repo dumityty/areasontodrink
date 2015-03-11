@@ -4,7 +4,18 @@
   <div class="container-fluid">
     <div class="col-sm-12 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
       <div class="row">
-        {{reason.reason}}
+      	<div class="flash">
+      		<span class="text-info">{{ flash.info }}</span>
+      	</div>
+      	<br>
+      	{% if reason %}
+	        <div class="reason" data-id="{{reason.id}}">
+	        	{{reason.reason}}
+	        </div>
+	        <div class="report">
+	        	<a href="/report/{{reason.id}}" class="text-danger">Report</a>
+	        </div>
+	       {% endif %}
       </div>
     </div>
   </div>
