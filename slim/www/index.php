@@ -3,7 +3,7 @@ session_cache_limiter(false);
 session_start();
 
 require '../vendor/autoload.php';
-require '../vendor/rb.php';
+require '../app/rb.php';
 require '../app/config.php';
 
 
