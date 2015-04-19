@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+  <div class="container-fluid">
+    <div class="col-sm-12 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+      <div class="row">
+      	<div class="flash">
+      		<p class="text-info">{{ flash.info }}</p>
+      		<p class="text-danger">{{ flash.error }}</p>
+      	</div>
+      	<br>
+      	{% if reported %}
+	        <table class="table table-hover">
+            <thead><td>ID</td><td>Reason</td><td>Ops</td></thead>
+            {% for reason in reported %}
+              <tr>
+                <td>{{ reason.id }}</td>
+                <td>{{ reason.reason }}</td>
+                <td><a href="/reason/unflag/{{reason.id}}">Unflag</a> / <a href="/reason/delete/{{reason.id}}">Delete</a></td>
+              </tr>              
+            {% endfor %}
+          </table>
+	       {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -7,7 +7,7 @@ body {
  * HEADER
  */
 .navbar-brand { 
-	font-family: 'Just Another Hand', cursive;
+	font-family: 'Courgette', cursive;
 	font-size: 35px;
 	letter-spacing: 2px;
 }
@@ -48,6 +48,57 @@ body {
 	color: #FFC52C;
 }
 
+
+/**
+ * new menu
+
+ mobile - 
+ on first menu block
+	border-left: solid 1px #ccc;
+ on last menu block
+	border-right: solid 1px #ccc;
+
+ */
+
+.logo {
+	font-family: 'Fjalla One', sans-serif;
+	font-size: 22px;
+	letter-spacing: 0px;
+	font-weight: normal;
+	/*text-align: center;*/
+	color: #AC4147;
+
+	float:left;
+	height: 50px;
+	line-height: 50px;
+}
+
+.menu {
+	float: right;
+}
+
+.menu .menu-block {
+	text-align: center;
+	height:50px;
+	line-height: 50px;
+	padding: 0;
+	width: 50px;
+}
+	
+	/*
+	 mobile for menu-block
+	border-right: solid 1px #ccc;
+	border-bottom: solid 1px #ccc;*/
+.menu .menu-block.first {
+	border-left: none;
+}
+.menu .menu-block.last {
+	border-right: none;
+}
+.menu .menu-block a {
+	display: block;
+	color: #AC4147;
+}
 
 /**
  * CONTENT

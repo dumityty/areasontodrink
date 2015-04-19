@@ -78,11 +78,13 @@ $app->get('/', function() use ($app) {
   if ($reason != null) {
     add_reason_queue($reason['id']);
     clean_reason_queue();
+    $_SESSION['current_reason'] = $reason['id'];
   }
   else {
     purge_queue();
     $app->flashNow('info', 'Sorry! No reasons!');
   }
+
   
   $app->render('routes/index.html.twig', array(
     'reason' => $reason,
@@ -137,21 +139,69 @@ $app->post('/add', function() use ($app) {
 });
 
 $app->get('/why', function() use ($app) {
-  $app->render('routes/why.html.twig', array(
-  ));
+  $app->render('routes/why.html.twig', array());
 })->name('why');
 
 $app->get('/report/:rid', function($rid) use ($app) {
   // $sql = "INSERT INTO reported (rid) VALUES (:rid)";
   // R::exec($sql, array(':rid' => $rid));
 
+  // if you didnt come from home, then you can't report
+  // maybe still check for referer as well
+  // but for now this is ok
+  if ((!isset($_SESSION['current_reason'])) || ($_SESSION['current_reason'] != $rid)) {
+    if (isset($_SESSION['current_reason'])) {
+      unset($_SESSION['current_reason']);
+    }
+    $app->flash('error', 'Report unsuccessful');
+    $app->redirectTo('home');
+  }
+
+
   $reported = R::dispense('reported');
   $reported->rid = $rid;
   $id = R::store($reported);
+
+  if (isset($_SESSION['current_reason'])) {
+    unset($_SESSION['current_reason']);
+  }
 
   $app->flash('info', 'Reason has been reported.');
   $app->redirectTo('home');
 })->name('report');
 
+
+/* admin routes */
+
+$app->get('/reported', function() use ($app) {
+  $reported = R::findAll('reported');
+
+  $sql = 'SELECT r.* FROM reasons r INNER JOIN reported re ON r.id = re.rid';
+  $rows = R::getAll($sql);
+  $reported = R::convertToBeans('reasons',$rows);
+
+  krumo($reported);
+
+  $app->render('routes/reported.html.twig', array(
+    'reported' => $reported,
+  ));
+})->name('reported');;
+
+$app->get('/reason/unflag/:id', function($id) use ($app) {
+  $sql = "DELETE FROM reported WHERE rid = :id";
+  R::exec($sql, array(':id' => $id));
+
+  $app->redirectTo('reported');
+});
+$app->get('/reason/delete/:id', function($id) use ($app) {
+  krumo($id);
+  $sql = "DELETE FROM reasons WHERE id = :id";
+  R::exec($sql, array(':id' => $id));
+
+  $sql = "DELETE FROM reported WHERE rid = :id";
+  R::exec($sql, array(':id' => $id));
+
+  $app->redirectTo('reported');
+});
 $app->run();
 

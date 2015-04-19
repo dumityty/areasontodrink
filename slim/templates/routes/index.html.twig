@@ -5,7 +5,8 @@
     <div class="col-sm-12 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
       <div class="row">
       	<div class="flash">
-      		<span class="text-info">{{ flash.info }}</span>
+      		<p class="text-info">{{ flash.info }}</p>
+      		<p class="text-danger">{{flash.error}}</p>
       	</div>
       	<br>
       	{% if reason %}
